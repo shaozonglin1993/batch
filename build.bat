@@ -937,7 +937,7 @@ goto:EOF
 	call::get_ddsgen_version
 
 @REM INtime实时操作系统与Windows的完美结合 --百度百科
-@REM x%architecture:INtime 这里的 : 作用？？？
+@REM x%architecture:INtime 这里的 : 作用？？？可以直接引用
 	if not x%architecture:INtime=%==x%architecture% (
 		set begin_sol=perftest_publisher-
 		set begin_sol_cs=perftest-
@@ -1078,6 +1078,7 @@ GOTO:EOF
 	echo ================================================================================
 GOTO:EOF
 
+@REM 清理
 :clean_src_cpp_common
 	@REM # Remove copied file from srcCommon
 	for %%i in (%common_cpp_folder%\*) do (
@@ -1086,6 +1087,7 @@ GOTO:EOF
 	)
 GOTO:EOF
 
+@REM 拷贝
 :copy_src_cpp_common
 	@REM # Copy file from srcCommon to srcCpp and srcCpp03
 	for %%i in (%common_cpp_folder%\*) do (
@@ -1095,6 +1097,7 @@ GOTO:EOF
 
 GOTO:EOF
 
+@REM 清理
 :clean_custom_type_files
 	@REM # Remove generated files of the customer type
 	for %%i in (%custom_type_folder%\*) do (
@@ -1107,6 +1110,7 @@ GOTO:EOF
 
 GOTO:EOF
 
+@REM 清理
 :clean
 	echo[
 	echo Cleaning generated files.
@@ -1156,3 +1160,9 @@ GOTO:EOF
 	echo[
 	echo ================================================================================
 GOTO:EOF
+
+
+@REM GOTO:EOF 返回并等待下一个命令
+@REM Exit 直接关闭当前批处理脚本，回到终端或“资源管理器”
+@REM exit /b 直接关闭当前批处理脚本而不是终端，回到终端或“资源管理器”
+@REM exit /b 1 设置返回值

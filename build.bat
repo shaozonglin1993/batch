@@ -300,7 +300,7 @@ if !BUILD_CPP03! == 1 (
 	set GENERATE_QOS_STRING=1
 )
 
-@REM 调用perl 生成QOS
+@REM 调用perl 生成QOS，不是必须
 if !GENERATE_QOS_STRING! == 1 (
 	call !PERL_EXEC! -version > nul 2>nul
 	if not !ERRORLEVEL! == 0 (
@@ -326,12 +326,13 @@ if !BUILD_MICRO! == 1 (
 	@REM # given the architecture.
 	call::get_solution_name
 
+@REM 设置代码生成器程序路径
 	set "rtiddsgen_executable=!NDDSHOME!/bin/rtiddsgen.bat"
 )
 
 ::------------------------------------------------------------------------------
 @REM -cpp-build
-@REM 一般编译该部分
+@REM 一般情况编译该部分CPP
 if !BUILD_CPP! == 1 (
 
 @REM 文件拷贝方法，Copy file from srcCommon to srcCpp and srcCpp03
@@ -390,7 +391,7 @@ if !BUILD_CPP! == 1 (
 		)
 	)
 
-@REM 是什么？？？
+@REM LEGACY_DD_IMPL 是什么？？？
 	if !LEGACY_DD_IMPL! == 1 (
 		echo [INFO]: Allow the use of both legacy and new Dynamic Data Impl.
 		set "ADDITIONAL_DEFINES=!ADDITIONAL_DEFINES! RTI_LEGACY_DD_IMPL"
@@ -445,11 +446,11 @@ if !BUILD_CPP! == 1 (
 		set "ADDITIONAL_DEFINES=!ADDITIONAL_DEFINES! PERFTEST_COMMIT_ID=\"!commit_id!\""
 	)
 
-
+@REM 设置构建工程所需要的其他源文件/头文件
 	set "ADDITIONAL_DEFINES=/0x !ADDITIONAL_DEFINES!"
 	set "additional_header_files=!additional_header_files_custom_type!!additional_header_files!RTIRawTransportImpl.h Parameter.h ParameterManager.h ThreadPriorities.h RTIDDSLoggerDevice.h MessagingIF.h RTIDDSImpl.h perftest_cpp.h qos_string.h CpuMonitor.h PerftestTransport.h Infrastructure_common.h Infrastructure_pro.h PerftestPrinter.h FileDataLoader.h"
 	set "additional_source_files=!additional_source_files_custom_type!!additional_source_files!RTIRawTransportImpl.cxx Parameter.cxx ParameterManager.cxx ThreadPriorities.cxx RTIDDSLoggerDevice.cxx RTIDDSImpl.cxx CpuMonitor.cxx PerftestTransport.cxx Infrastructure_common.cxx Infrastructure_pro.cxx PerftestPrinter.cxx FileDataLoader.cxx"
-
+@REM flat data，默认为0
 	if !FLATDATA_AVAILABLE! == 1 (
 		set "additional_header_files=!additional_header_files! perftest_ZeroCopy.h perftest_ZeroCopyPlugin.h perftest_ZeroCopySupport.h"
 		set "additional_source_files=!additional_source_files! perftest_ZeroCopy.cxx perftest_ZeroCopyPlugin.cxx perftest_ZeroCopySupport.cxx"
@@ -468,7 +469,7 @@ if !BUILD_CPP! == 1 (
 	)
 
 @REM 代码生成器生成perftest.idl类型文件
-@REM 这里是调用参数输出
+@REM 这里是参数【输出】
 	echo[
 	echo "%rtiddsgen_executable%" -language %classic_cpp_lang_string%^
 	-unboundedSupport -replace -create typefiles -create makefiles^
@@ -481,7 +482,7 @@ if !BUILD_CPP! == 1 (
 	!rtiddsgen_extra_options! !additional_defines_custom_type!^
 	-d "%classic_cpp_folder%" "%idl_location%\perftest.idl"
 
-@REM 这里是调用
+@REM 这里是程序【调用】
 	echo[
 	echo [INFO]: Generating types and makefiles for %classic_cpp_lang_string%
 	call "%rtiddsgen_executable%" -language %classic_cpp_lang_string%^
@@ -500,7 +501,7 @@ if !BUILD_CPP! == 1 (
 		exit /b 1
 	)
 
-@REM flat_data / zero_copy
+@REM flat_data / zero_copy，默认为 0
     @REM # Generate ZeroCopy types avoiding performance degradation issue
 	if !FLATDATA_AVAILABLE! == 1 (
 		echo[
@@ -884,7 +885,7 @@ echo[
 echo ================================================================================
 GOTO:EOF
 
-@REM 定义方法
+@REM #FUNCTIONS:
 @REM 解决方案属性 dynamic/static debug/release
 :solution_compilation_flag_calculation
 
@@ -922,6 +923,7 @@ GOTO:EOF
 	set /a version_number=%Major%%Minor%%Revision%
 GOTO:EOF
 
+@REM #FUNCTIONS:
 @REM 根据代码生成器的版本号判断是否需要构建flat data工程，代码生成器3.0及以上才支持
 :get_flatdata_available
 	call::get_ddsgen_version
@@ -932,6 +934,7 @@ GOTO:EOF
 	)
 goto:EOF
 
+@REM #FUNCTIONS:
 @REM 获取解决方案名称
 :get_solution_name
 	call::get_ddsgen_version
